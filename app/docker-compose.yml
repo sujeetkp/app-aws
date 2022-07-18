@@ -1,0 +1,50 @@
+version: "3"
+services:
+    db:
+        container_name: blog-postgres-db
+        image: postgres
+        environment: 
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        volumes: 
+            - postgres-data:/var/lib/postgresql/data
+        networks: 
+            - netapp
+    web:
+        container_name: blog
+        image: sujeetkp/blog:2.0
+        depends_on:
+            - db
+        environment: 
+            -  DB_SERVER=${DB_SERVER}
+            -  DB_PORT=${DB_PORT}
+            -  DB_USERNAME=${DB_USERNAME}
+            -  DATABASE_NAME=${DATABASE_NAME}
+            -  DB_PASSWORD=${DB_PASSWORD}
+            -  EMAIL_USER=${EMAIL_USER}
+            -  EMAIL_PASS=${EMAIL_PASS}
+            -  SECRET_KEY=${SECRET_KEY}
+            -  SQLALCHEMY_TRACK_MODIFICATIONS=${SQLALCHEMY_TRACK_MODIFICATIONS}
+            -  MAIL_SERVER=${MAIL_SERVER}
+            -  MAIL_PORT=${MAIL_PORT}
+            -  MAIL_USE_TLS=${MAIL_USE_TLS}
+            -  FLASK_APP=${FLASK_APP}
+            -  AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            -  AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            -  BUCKET=${BUCKET}
+        networks: 
+            - netapp
+    nginx:
+        container_name: blog-nginx
+        image: sujeetkp/blog-nginx:1.0
+        ports: 
+            - "80:80"
+        depends_on: 
+            - web
+        networks: 
+            - netapp
+networks: 
+    netapp:
+
+volumes: 
+    postgres-data:
+

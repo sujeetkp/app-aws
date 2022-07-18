@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.inputs.blogDeploy.name }}
+spec:
+  replicas: {{ .Values.inputs.blogDeploy.replicaCount }}
+  selector:
+    matchLabels:
+      app: blog
+  template:
+    metadata:
+      labels:
+        app: blog
+        version: "2.0"
+    spec:
+      containers:
+      - name: blog
+        image: {{ .Values.inputs.blogDeploy.image }}
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: {{ .Values.inputs.blogDeploy.limits.memory | quote }}
+            cpu: {{ .Values.inputs.blogDeploy.limits.cpu | quote }}
+        ports:
+        - containerPort: {{ .Values.inputs.blogDeploy.ports.containerPort }}
+        env:
+          - name: DB_SERVER
+            value: {{ .Values.inputs.blogDeploy.environment.dbServer }}
+          - name: DB_PORT
+            value: {{ .Values.inputs.blogDeploy.environment.dbPort | quote }}
+          - name: DB_USERNAME
+            value: {{ .Values.inputs.blogDeploy.environment.dbUsername }}
+          - name: DATABASE_NAME
+            value: {{ .Values.inputs.blogDeploy.environment.dbName }}
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.inputs.blogDeploy.secret.name }}
+                key: {{ .Values.inputs.blogDeploy.secret.dbPassKey }}
+          - name: EMAIL_USER
+            value: {{ .Values.inputs.blogDeploy.environment.emailUsername }}
+          - name: EMAIL_PASS
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.inputs.blogDeploy.secret.name }}
+                key: {{ .Values.inputs.blogDeploy.secret.emailPassKey }}
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.inputs.blogDeploy.secret.name }}
+                key: {{ .Values.inputs.blogDeploy.secret.secretKey }}
+          - name: SQLALCHEMY_TRACK_MODIFICATIONS
+            value: {{ .Values.inputs.blogDeploy.environment.sqlalchemyTrack | quote }}
+          - name: MAIL_SERVER
+            value: {{ .Values.inputs.blogDeploy.environment.mailServer }}
+          - name: MAIL_PORT
+            value: {{ .Values.inputs.blogDeploy.environment.mailPort | quote }}
+          - name: MAIL_USE_TLS
+            value: {{ .Values.inputs.blogDeploy.environment.mailUseTLS | quote }}
+          - name: FLASK_APP
+            value: {{ .Values.inputs.blogDeploy.environment.flaskApp }}
+          - name: BUCKET
+            value: {{ .Values.inputs.blogDeploy.environment.bucket }}
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.inputs.blogDeploy.secret.name }}
+                key: {{ .Values.inputs.blogDeploy.secret.aws_access_key_id }}
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.inputs.blogDeploy.secret.name }}
+                key: {{ .Values.inputs.blogDeploy.secret.aws_secret_access_key }}
+
+                

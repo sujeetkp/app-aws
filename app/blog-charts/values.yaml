@@ -1,0 +1,112 @@
+# Default values for blog-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+inputs:
+  blogDeploy:
+    name: blog-deploy
+    replicaCount: 1
+    image: sujeetkp/blog:2.0
+    limits:
+      memory: 500M
+      cpu: 1
+    ports:
+      containerPort: 5000
+    environment:
+      dbServer: db
+      dbPort: 5432
+      dbUsername: postgres
+      dbName: postgres
+      emailUsername: sujeetkumpadhi@gmail.com
+      mailServer: smtp.gmail.com
+      mailPort: 587
+      mailUseTLS: "True"
+      sqlalchemyTrack: "True"
+      flaskApp: run.py
+      bucket: app-s3-images
+    secret:
+      name: secretdata
+      dbPassKey: dbpassword
+      emailPassKey: emailpassword
+      secretKey: secretkey
+      aws_access_key_id: aws_access_key_id
+      aws_secret_access_key: aws_secret_access_key
+    hpa:
+      name: blog-hpa
+      minReplicas: 1
+      maxReplicas: 5
+      averageCPUUtilization: 50
+      averageMemoryUtilization: 80
+  nginxDeploy:
+    name: blog-nginx-deploy
+    replicaCount: 1
+    image: sujeetkp/blog-nginx:1.0
+    limits:
+      memory: 128M
+      cpu: 0.2
+    ports:
+      containerPort: 80
+  nginxService:
+    name: blog-endpoint
+    type: ClusterIP
+    ports:
+      port: 80
+      targetPort: 80
+  appVolumeClaim:
+    name: blog-pvc
+    storage: 1G
+    volumeMode: Filesystem
+    accessModes: 
+      - ReadWriteOnce
+  blogService:
+    name: web
+    type: ClusterIP
+    ports:
+      port: 5000
+      targetPort: 5000
+  dbVolumeClaim:
+    name: db-pvc
+    storage: 2G
+    volumeMode: Filesystem
+    accessModes: 
+      - ReadWriteOnce
+  dbDeploy:
+    name: postgres
+    replicaCount: 1
+    image: postgres
+    limits:
+      memory: 128M
+      cpu: 0.2
+    ports:
+      containerPort: 5432
+    secret:
+      name: secretdata
+      dbPassKey: dbpassword
+    volume:
+      name: postgres-data
+      mountPath: /var/lib/postgresql/data
+      subPath: dbdata
+  dbService:
+    name: db
+    type: ClusterIP
+    ports:
+      port: 5432
+      targetPort: 5432
+  clusterIssuer:
+    name: letsencrypt-prod
+    email: sujeetkupadhi@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    secretName: letsencrypt-production-private-key
+  ingress:
+    name: ingress-service
+    secretName: web-simplifydev-co
+    tlsHosts:
+      - web.simplifydev.co
+    annotations:
+      ingressClass: nginx                      
+      sslRedirect: "True"        
+    backends:
+      - pathType: Prefix
+        path: /
+        serviceName: blog-endpoint
+        servicePort: 80

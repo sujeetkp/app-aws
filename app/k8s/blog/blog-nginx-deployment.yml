@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-nginx-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog-nginx
+  template:
+    metadata:
+      labels:
+        app: blog-nginx
+        version: "1.0"
+    spec:
+      containers:
+      - name: blog-nginx
+        image: sujeetkp/blog-nginx:1.0
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "128M"
+            cpu: "0.2"
+        ports:
+        - containerPort: 80

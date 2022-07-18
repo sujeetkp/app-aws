@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog
+  template:
+    metadata:
+      labels:
+        app: blog
+        version: "2.0"
+    spec:
+      containers:
+      - name: blog
+        image: sujeetkp/blog:2.0
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "500M"
+            cpu: "1"
+        ports:
+        - containerPort: 5000
+        env:
+          - name: DB_SERVER
+            value: db
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_USERNAME
+            value: postgres
+          - name: DATABASE_NAME
+            value: postgres
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: secretdata
+                key: dbpassword
+          - name: EMAIL_USER
+            value: sujeetkumpadhi@gmail.com
+          - name: EMAIL_PASS
+            valueFrom:
+              secretKeyRef:
+                name: secretdata
+                key: emailpassword
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: secretdata
+                key: secretkey
+          - name: SQLALCHEMY_TRACK_MODIFICATIONS
+            value: "True"
+          - name: MAIL_SERVER
+            value: smtp.gmail.com
+          - name: MAIL_PORT
+            value: "587"
+          - name: MAIL_USE_TLS
+            value: "True"
+          - name: FLASK_APP
+            value: run.py
+          - name: BUCKET
+            value: "app-s3-images"
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: secretdata
+                key: aws_access_key_id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: secretdata
+                key: aws_secret_access_key
+                

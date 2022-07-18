@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-endpoint
+spec:
+  type: ClusterIP
+  selector:
+    app: blog-nginx
+  ports:
+  - port: 80
+    targetPort: 80
