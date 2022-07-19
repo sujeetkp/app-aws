@@ -2,7 +2,7 @@ version: "3"
 services:
     db:
         container_name: blog-postgres-db
-        image: postgres
+        image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/postgres:latest
         environment: 
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
         volumes: 
@@ -11,7 +11,7 @@ services:
             - netapp
     web:
         container_name: blog
-        image: sujeetkp/blog:2.0
+        image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/blog:2.0
         depends_on:
             - db
         environment: 
@@ -35,7 +35,7 @@ services:
             - netapp
     nginx:
         container_name: blog-nginx
-        image: sujeetkp/blog-nginx:1.0
+        image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/blog-nginx:1.0
         ports: 
             - "80:80"
         depends_on: 

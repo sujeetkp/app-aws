@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgres
+#        image: postgres
+        image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/postgres:latest
         resources:
           limits:
             memory: "128M"
