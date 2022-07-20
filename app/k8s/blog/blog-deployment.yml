@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: blog
-#       image: sujeetkp/blog:2.0
-        image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/blog:2.0
+        image: sujeetkp/blog:2.0
+#        image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/blog:2.0
         imagePullPolicy: Always
         resources:
           limits:

@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: blog-nginx
-#        image: sujeetkp/blog-nginx:1.0
-        image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/blog-nginx:1.0
+        image: sujeetkp/blog-nginx:1.0
+#        image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/blog-nginx:1.0
         imagePullPolicy: Always
         resources:
           limits:
