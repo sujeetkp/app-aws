@@ -1,12 +1,15 @@
 from flask import render_template, request, Blueprint
 from flaskblog.models import Post
 from flaskblog.users.utils import get_picture
+from prometheus_client import Counter, generate_latest
 
 main = Blueprint('main', __name__)
+view_metric = Counter('http_request', 'Total http request counter')
 
 @main.route('/')
 @main.route('/home')
 def home():
+    view_metric.inc()
     presigned_urls = {}
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc())
@@ -23,3 +26,7 @@ def home():
 @main.route('/about')
 def about():
     return render_template('about.html', title='About')
+
+@main.route('/metrics')
+def metrics():
+    return generate_latest()

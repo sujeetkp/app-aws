@@ -1,0 +1,18 @@
+kind: ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: {{ .Values.inputs.serviceMonitor.name }}
+  labels: 
+    {{- range $key, $value := .Values.inputs.serviceMonitor.labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels: 
+      {{- range $key, $value := .Values.inputs.blogService.labels }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+  endpoints:
+  - port: {{ .Values.inputs.blogService.ports.name }}
+    path: {{ .Values.inputs.serviceMonitor.endpoints.path }}
+    interval: {{ .Values.inputs.serviceMonitor.endpoints.interval }}

@@ -6,7 +6,7 @@ inputs:
   blogDeploy:
     name: blog-deploy
     replicaCount: 1
-    image: sujeetkp/blog:2.0
+    image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/blog:2.0
     limits:
       memory: 500M
       cpu: 1
@@ -34,13 +34,15 @@ inputs:
     hpa:
       name: blog-hpa
       minReplicas: 1
-      maxReplicas: 5
-      averageCPUUtilization: 50
+      maxReplicas: 2
+      averageCPUUtilization: 80
       averageMemoryUtilization: 80
+      pod_metric_name: http_request_per_second
+      averageValue: 500m
   nginxDeploy:
     name: blog-nginx-deploy
     replicaCount: 1
-    image: sujeetkp/blog-nginx:1.0
+    image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/blog-nginx:1.0
     limits:
       memory: 128M
       cpu: 0.2
@@ -52,18 +54,15 @@ inputs:
     ports:
       port: 80
       targetPort: 80
-  appVolumeClaim:
-    name: blog-pvc
-    storage: 1G
-    volumeMode: Filesystem
-    accessModes: 
-      - ReadWriteOnce
   blogService:
     name: web
     type: ClusterIP
+    labels:
+      svc: web-endpoint
     ports:
       port: 5000
       targetPort: 5000
+      name: http
   dbVolumeClaim:
     name: db-pvc
     storage: 2G
@@ -73,7 +72,7 @@ inputs:
   dbDeploy:
     name: postgres
     replicaCount: 1
-    image: postgres
+    image: 428411933129.dkr.ecr.us-east-1.amazonaws.com/postgres:latest
     limits:
       memory: 128M
       cpu: 0.2
@@ -99,9 +98,9 @@ inputs:
     secretName: letsencrypt-production-private-key
   ingress:
     name: ingress-service
-    secretName: web-simplifydev-co
+    secretName: blog-simplifydev-co
     tlsHosts:
-      - web.simplifydev.co
+      - blog.simplifydev.co
     annotations:
       ingressClass: nginx                      
       sslRedirect: "True"        
@@ -110,3 +109,12 @@ inputs:
         path: /
         serviceName: blog-endpoint
         servicePort: 80
+  serviceMonitor:
+    name: blog-app
+    labels:
+      app: blog-app
+      release: kube-prometheus-stack
+    endpoints:
+      interval: 15s
+      path: "/metrics"
+

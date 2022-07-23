@@ -13,9 +13,9 @@ inputs:
     ports:
       containerPort: 5000
     environment:
-      dbServer: dev-postgres-aks.privatelink.postgres.database.azure.com
+      dbServer: stage-tech-aurora-postgres-db.cluster-cusgefost8jn.us-east-1.rds.amazonaws.com
       dbPort: 5432
-      dbUsername: postgres@dev-postgres-aks
+      dbUsername: postgres
       dbName: postgres
       emailUsername: sujeetkumpadhi@gmail.com
       mailServer: smtp.gmail.com
@@ -31,16 +31,14 @@ inputs:
       secretKey: secretkey
       aws_access_key_id: aws_access_key_id
       aws_secret_access_key: aws_secret_access_key
-    volume:
-      name: blog-data
-      mountPath: /app/flaskblog/static
-      subPath: data
     hpa:
       name: blog-hpa
       minReplicas: 1
-      maxReplicas: 5
-      averageCPUUtilization: 50
+      maxReplicas: 2
+      averageCPUUtilization: 80
       averageMemoryUtilization: 80
+      pod_metric_name: http_request_per_second
+      averageValue: 500m
   nginxDeploy:
     name: blog-nginx-deploy
     replicaCount: 1
@@ -56,18 +54,15 @@ inputs:
     ports:
       port: 80
       targetPort: 80
-  appVolumeClaim:
-    name: blog-pvc
-    storage: 1G
-    volumeMode: Filesystem
-    accessModes: 
-      - ReadWriteOnce
   blogService:
     name: web
     type: ClusterIP
+    labels:
+      svc: web-endpoint
     ports:
       port: 5000
       targetPort: 5000
+      name: http
   clusterIssuer:
     name: letsencrypt-prod
     email: sujeetkupadhi@gmail.com
@@ -75,9 +70,9 @@ inputs:
     secretName: letsencrypt-production-private-key
   ingress:
     name: ingress-service
-    secretName: web-simplifydev-co
+    secretName: blog-simplifydev-co
     tlsHosts:
-      - web.simplifydev.co
+      - blog.simplifydev.co
     annotations:
       ingressClass: nginx                      
       sslRedirect: "True"        
@@ -86,3 +81,11 @@ inputs:
         path: /
         serviceName: blog-endpoint
         servicePort: 80
+  serviceMonitor:
+    name: blog-app
+    labels:
+      app: blog-app
+      release: kube-prometheus-stack
+    endpoints:
+      interval: 15s
+      path: "/metrics"

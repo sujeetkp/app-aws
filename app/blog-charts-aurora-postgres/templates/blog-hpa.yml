@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Values.inputs.blogDeploy.hpa.name }}
@@ -10,15 +10,12 @@ spec:
   minReplicas: {{ .Values.inputs.blogDeploy.hpa.minReplicas }}
   maxReplicas: {{ .Values.inputs.blogDeploy.hpa.maxReplicas }}
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
+  - type: Pods
+    pods:
+      metric:
+        name: {{ .Values.inputs.blogDeploy.hpa.pod_metric_name }}
       target:
-        type: Utilization
-        averageUtilization: {{ .Values.inputs.blogDeploy.hpa.averageCPUUtilization }}
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: {{ .Values.inputs.blogDeploy.hpa.averageMemoryUtilization }}
+        # target 500 milli-requests per second,
+        # which is 1 request every two seconds
+        type: AverageValue
+        averageValue: {{ .Values.inputs.blogDeploy.hpa.averageValue }}

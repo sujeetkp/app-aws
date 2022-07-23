@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: blog-hpa
@@ -8,11 +8,16 @@ spec:
     kind: Deployment
     name: blog-deploy
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 2
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
+  - type: Pods
+    pods:
+      metric:
+        name: http_request_per_second
       target:
-        type: Utilization
-        averageUtilization: 50
+        # target 500 milli-requests per second,
+        # which is 1 request every two seconds
+        type: AverageValue
+        averageValue: 500m
+
+  

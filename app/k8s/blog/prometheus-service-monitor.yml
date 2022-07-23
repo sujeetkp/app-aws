@@ -1,0 +1,15 @@
+kind: ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: blog-app
+  labels:
+    app: blog-app
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      svc: web-endpoint
+  endpoints:
+  - port: http
+    path: "/metrics"
+    interval: 15s
